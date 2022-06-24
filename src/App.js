@@ -1,25 +1,40 @@
-import logo from './logo.svg';
-import './App.css';
-
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import React, { Component } from "react";
+import {Routes, Route, Link} from "react-router-dom";
+import "./App.css";
+import "font-awesome/css/font-awesome.min.css";
+import AddTache from "./components/add-tache.component";
+import Tache from "./components/tache.component";
+import TachesList from "./components/list-tache.component";
+class App extends Component {
+  render() {
+    return (
+        <div>
+            <nav className="menu">
+                <a href="/taches" className="menu-titre">
+                    Gestion des taches
+                </a>
+                <div className="sous-menu">
+                    <li>
+                        <Link to={"/taches"} className="menu-item">
+                            Taches
+                        </Link>
+                    </li>
+                    <li>
+                        <Link to={"/add"} className="menu-item">
+                            Ajouter tâche
+                        </Link>
+                    </li>
+                </div>
+            </nav>
+            <Routes>
+                <Route exact path="/" element={<TachesList/>} />
+                <Route exact path="/taches" element={<TachesList/>} />
+                <Route exact path="/delete/:id" element={<Tache/>} />
+                <Route exact path="/add" element={<AddTache/>} />
+                <Route path="/taches/:id" element={<Tache/>} />
+            </Routes>
+        </div>
+    );
+  }
 }
-
 export default App;

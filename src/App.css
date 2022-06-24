@@ -1,38 +1,169 @@
-.App {
+.box-search{
+  display : flex;
+  flex-direction: row;
+  margin-left : 35%;
+}
+.barre-search{
+  width: 25%;
+  height: 2.8em;
+  outline: none;
+  background: #e1e1e1;
+  color: black;
+  text-decoration: none;
+  list-style-type: none;
+  border: solid 0.5px #c0bcbc;
+  border-radius: 3px;
+}
+.btn-search{
+  width: 150%;
+  height: 3em;
+  border-radius: 3px;
+  color: #6c757d;
+  background-color: #fff;
+  border: solid 0.5px #38404b;
+  cursor: pointer;
+}
+.btn-remove-all{
   text-align: center;
+  margin-top: 20px;
+  margin-left: 12%;
+  width: 10%;
+  height: 2.3em;
+  border-radius: 3px;
+  color: #efefef;
+  background-color: #d93232;
+  border: none;
 }
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.menu{
+  margin-top:-10px;
+  height : 6vh;
+  display: flex;
+  width : 100%;
+  flex-direction: row;
+  background-color: black;
+  padding-bottom: 20px;
+  padding-left : 16px;
+  margin-left: -8px;
 }
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.menu-titre{
+  color : #fcf5f5;
+  text-decoration : none;
+  font-size: 1.4em;
+  font-family: Algerian;
+  margin-top : 1.5%;
+  margin-left: -1%;
 }
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.sous-menu{
+  margin-top: 1.8%;
+  display: flex;
+  flex-direction: row;
+}
+.menu-item{
+  color : #cbbdbd;
+  text-decoration : none;
+  font-size: 1em;
+}
+.container{
+  width : 100%;
+  margin-top: 2vh;
+  display : block;
+}
+.box-taches{
+  margin-left : 35%;
+}
+.box-taches h2{
+  font-size: 2em;
+  color : #38404b;
+}
+.ul-tache{
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  padding-left: 0;
+  margin-bottom: 0;
 }
-
-.App-link {
-  color: #61dafb;
+.box-taches-item{
+  width : 30%;
+  position: relative;
+  display: block;
+  padding: .5rem 1rem;
+  color: #212529;
+  text-decoration: none;
+  background-color: #fff;
+  border: 1px solid rgba(0,0,0,.125);
+  border-radius: .25rem;
+  font-size: 1.2em;
 }
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.box-taches-item.active{
+  z-index: 2;
+  color: #fff;
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+.box-current-tache{
+  color: #342828;
+  background-color: #f8f2f2;
+  margin-left: 36%;
+  max-width: 20%;
+  margin-top: 2vh;
+  font-size: 1.2em;
+}
+.box-current-tache p{
+  color: black;
+  background-color: white;
+}
+.box-current-tache h4{
+  padding-top: 0.2em;
+  text-align: center;
+  color: #593636;
+  font-size: 1.5em;
+}
+.box-current-tache label{
+  margin-top: -1em;
+  color: #563131;
+  font-size: 1.1em;
+}
+.current-tache-edit{
+  color: #b04242;
+  text-decoration: none;
+  margin-right: 2em;
+}
+.form-control {
+   display: block;
+   width: 100%;
+   padding: .375rem .75rem;
+   font-size: 1rem;
+   font-weight: 400;
+   line-height: 1.5;
+   color: #212529;
+   background-color: #fff;
+   background-clip: padding-box;
+   border: 1px solid #ced4da;
+   appearance: none;
+   border-radius: .25rem;
+   transition: border-color .15s
+}
+.btn-add {
+  color: #fff;
+  background-color: #198754;
+  border-color: #198754;
+}
+.btn-modify {
+  color: #fff;
+  background-color: #198754;
+  border-color: #198754;
+  margin-right: 2em;
+  margin-top: 1em;
+}
+.submit-form {
+  max-width: 300px;
+  margin: auto;
+}
+.submit-form div {
+  display: block;
+}
+.submit-form*, ::after, ::before {
+  box-sizing: border-box;
+}
+.submit-form label{
+  display: inline-block;
 }
