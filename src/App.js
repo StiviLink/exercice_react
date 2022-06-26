@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import {Routes, Route, Link, Navigate} from "react-router-dom";
 import "./App.css";
-import "font-awesome/css/font-awesome.min.css";
 import AddTache from "./components/add-tache.component";
 import Tache from "./components/tache.component";
 import TachesList from "./components/list-tache.component";

@@ -104,32 +104,36 @@ class TachesList extends Component {
     }
     removeAllTaches(e) {
         e.preventDefault();
-        this.props.taches.forEach(tache=>{
-            this.props.onDelete(tache.id);
-        })
-        TacheDataService.deleteAll()
-            .then(response => {
-                console.log(response.data);
-                this.refreshList();
+        if(window.confirm("Vous allez supprimer toutes les taches")){
+            this.props.taches.forEach(tache=>{
+                this.props.onDelete(tache.id);
             })
-            .catch(e => {
-                console.log(e);
-            });
+            TacheDataService.deleteAll()
+                .then(response => {
+                    console.log(response.data);
+                    this.refreshList();
+                })
+                .catch(e => {
+                    console.log(e);
+                });
+        }
     }
     removeTache(id, e) {
         e.preventDefault();
-        this.props.onDelete(id);
-        this.setState({
-            currentTache: null,
-            currentIndex: -1
-        });
-        TacheDataService.delete(id)
-            .then(response => {
-                console.log(response.data);
-            })
-            .catch(e => {
-                console.log(e);
+        if(window.confirm("Vous allez supprimer cette tache")){
+            this.props.onDelete(id);
+            this.setState({
+                currentTache: null,
+                currentIndex: -1
             });
+            TacheDataService.delete(id)
+                .then(response => {
+                    console.log(response.data);
+                })
+                .catch(e => {
+                    console.log(e);
+                });
+        }
     }
     searchName() {
         console.log(this.props.taches);
