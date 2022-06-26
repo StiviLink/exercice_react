@@ -1,33 +1,34 @@
 .box-search{
   display : flex;
   flex-direction: row;
-  margin-left : 35%;
+  margin : auto;
+  max-width: 50%;
 }
 .barre-search{
-  width: 25%;
+  width: 70%;
   height: 2.8em;
   outline: none;
   background: #e1e1e1;
   color: black;
   text-decoration: none;
   list-style-type: none;
-  border: solid 0.5px #c0bcbc;
+  border: solid 1px #c0bcbc;
   border-radius: 3px;
 }
 .btn-search{
-  width: 150%;
+  width: 200%;
   height: 3em;
   border-radius: 3px;
   color: #6c757d;
   background-color: #fff;
-  border: solid 0.5px #38404b;
+  border: solid 1px #38404b;
   cursor: pointer;
 }
 .btn-remove-all{
   text-align: center;
-  margin-top: 20px;
-  margin-left: 12%;
-  width: 10%;
+  margin-left: 40%;
+  margin-top: 2vh;
+  width: 20%;
   height: 2.3em;
   border-radius: 3px;
   color: #efefef;
@@ -49,7 +50,7 @@
   color : #fcf5f5;
   text-decoration : none;
   font-size: 1.4em;
-  font-family: Algerian;
+  font-family: Algerian, cursive;
   margin-top : 1.5%;
   margin-left: -1%;
 }
@@ -64,26 +65,56 @@
   font-size: 1em;
 }
 .container{
-  width : 100%;
-  margin-top: 2vh;
+  width : 60%;
+  background-color : white;
+  border : solid 2px black;
+  padding : 2%;
   display : block;
 }
+.container-current-tache{
+  width : 40%;
+}
+.box-current-tache{
+  margin : auto;
+  color: #342828;
+  background-color: #f8f2f2;
+  max-width: 90%;
+  font-size: 1.2em;
+}
+.box-container{
+  width: 60%;
+  margin-top: 3vh;
+  margin-left: auto;
+  margin-right: auto;
+  display : flex;
+  flex-direction:row;
+}
 .box-taches{
-  margin-left : 35%;
+  margin : auto;
+  width: 80%;
+}
+.box-taches-fils{
+  display : flex;
+  flex-direction: row;
 }
 .box-taches h2{
+  text-align: center;
   font-size: 2em;
   color : #38404b;
 }
 .ul-tache{
+  width: 40%;
+  margin-left : auto;
+  margin-right : auto;
   display: flex;
   flex-direction: column;
-  padding-left: 0;
-  margin-bottom: 0;
+}
+.ul-tache h3{
+  text-align: center;
+  color : #38404b;
 }
 .box-taches-item{
-  width : 30%;
-  position: relative;
+  width : 80%;
   display: block;
   padding: .5rem 1rem;
   color: #212529;
@@ -99,28 +130,17 @@
   background-color: #0d6efd;
   border-color: #0d6efd;
 }
-.box-current-tache{
-  color: #342828;
-  background-color: #f8f2f2;
-  margin-left: 36%;
-  max-width: 20%;
-  margin-top: 2vh;
-  font-size: 1.2em;
-}
-.box-current-tache p{
-  color: black;
-  background-color: white;
-}
 .box-current-tache h4{
   padding-top: 0.2em;
   text-align: center;
   color: #593636;
   font-size: 1.5em;
 }
-.box-current-tache label{
-  margin-top: -1em;
+.label-current-tache{
   color: #563131;
   font-size: 1.1em;
+  margin-top: -3vh;
+  margin-bottom: 5vh;
 }
 .current-tache-edit{
   color: #b04242;
@@ -166,4 +186,9 @@
 }
 .submit-form label{
   display: inline-block;
+}
+.current-vide{
+  text-align: center;
+  margin-top: 20vh;
+  color : #38404b;
 }

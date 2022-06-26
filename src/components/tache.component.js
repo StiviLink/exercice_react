@@ -200,7 +200,6 @@ export default class Tache extends Component {
                     </div>
                 ) : (
                     <div>
-                        <br />
                         <p>Je vous prie de sélectionner une tâche...</p>
                     </div>
                 )}

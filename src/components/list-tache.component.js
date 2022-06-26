@@ -16,27 +16,54 @@ class TachesList extends Component {
         this.searchName = this.searchName.bind(this);
         this.state = {
             currentTache: null,
-            currentIndex: -1,
-            searchName: ""
+            currentIndex: -1
         };
     }
     componentDidMount() {
         this.retrieveTaches();
     }
+    retrievePropsTaches(response){
+        this.props.taches.forEach(tache=>{
+            this.props.onDelete(tache.id);
+        })
+        response.data.forEach(tache =>{
+            let result = !!this.props.taches.filter(taches => taches.id === tache.id);
+            if(result){
+                console.log(tache.id);
+                this.props.onAddTache({
+                    id : tache.id,
+                    name : tache.name,
+                    description : tache.description,
+                    statut : tache.statut,
+                    createdAt : tache.createdAt
+                });
+            }
+        });
+        console.log(response.data);
+    }
     onChangeSearchName(e) {
         const searchName = e.target.value;
-        this.setState({
-            searchName: searchName
-        });
+        TacheDataService.findByName(searchName)
+            .then(response => {
+                this.retrievePropsTaches(response);
+                this.setState({
+                    currentTache: null,
+                    currentIndex: -1
+                });
+            })
+            .catch(e => {
+                console.log(e);
+            });
     }
     changeStatut(tache, e){
+        console.log(!tache.statut);
         e.preventDefault();
         this.props.onModifyStatut(tache.id);
         this.setState({
             currentTache : tache
         })
         const data = {
-            statut: !tache.statut
+            statut: tache.statut
         };
         TacheDataService.update(tache.id, data)
             .then(response => {
@@ -49,23 +76,7 @@ class TachesList extends Component {
     retrieveTaches() {
         TacheDataService.getAll()
             .then(response => {
-                this.props.taches.forEach(tache=>{
-                    this.props.taches.onDelete(tache.id);
-                })
-                response.data.forEach(tache =>{
-                    let result = !!this.props.taches.filter(taches => taches.id === tache.id);
-                    if(result){
-                        console.log(tache.id);
-                        this.props.onAddTache({
-                            id : tache.id,
-                            name : tache.name,
-                            description : tache.description,
-                            statut : tache.statut,
-                            createdAt : tache.createdAt
-                        });
-                    }
-                });
-                console.log(response.data);
+                this.retrievePropsTaches(response);
             })
             .catch(e => {
                 console.log(e);
@@ -79,7 +90,7 @@ class TachesList extends Component {
         });
     }
     setActiveTache(tache, index) {
-        if(this.state.currentIndex !== index){
+        if(this.state.currentTache !== tache){
             this.setState({
                 currentTache: tache,
                 currentIndex: index
@@ -91,7 +102,11 @@ class TachesList extends Component {
             });
         }
     }
-    removeAllTaches() {
+    removeAllTaches(e) {
+        e.preventDefault();
+        this.props.taches.forEach(tache=>{
+            this.props.onDelete(tache.id);
+        })
         TacheDataService.deleteAll()
             .then(response => {
                 console.log(response.data);
@@ -117,27 +132,19 @@ class TachesList extends Component {
             });
     }
     searchName() {
-        TacheDataService.findByName(this.state.searchName)
-            .then(response => {
-                this.setState({
-                    taches: response.data
-                });
-                console.log(response.data);
-            })
-            .catch(e => {
-                console.log(e);
-            });
+        console.log(this.props.taches);
     }
     formatDate(date){
-        const jour = date.split('T')[0].split('-').reverse().join(' ');
+        const jour = date.split('T')[0].split('-').reverse().join('/');
         const heure = date.split('T')[1].split('', 8).join('');
         return jour + " à " + heure;
     }
     render() {
         const { searchName, currentTache, currentIndex } = this.state;
         return (
-            <div className="container">
-                <div className="box-search">
+            <div className="box-container">
+                <div className="container">
+                    <div className="box-search">
                         <input
                             type="text"
                             className="barre-search"
@@ -145,92 +152,116 @@ class TachesList extends Component {
                             value={searchName}
                             onChange={this.onChangeSearchName}
                         />
-                    <div className="input-group-append">
+                        <div className="input-group-append">
+                            <button
+                                onClick={this.searchName}
+                                className="btn-search"
+                                type="button"
+                            >
+                                Search
+                            </button>
+                        </div>
+                    </div>
+                    <div className="box-taches">
+                        <h2>liste des taches</h2>
+                        {this.props.taches.length===0 ? (<h2>Aucune tache disponible</h2>) :(
+                            <div className = "box-taches-fils">
+                                <ul className="ul-tache">
+                                    <h3>En cours</h3>
+                                    {this.props.taches &&
+                                        this.props.taches.filter(tache => tache.statut===false).map((tache, index) => (
+                                            <li
+                                                className={
+                                                    "box-taches-item " +
+                                                    (tache === currentTache? "active" : "")
+                                                }
+                                                onClick={() => this.setActiveTache(tache, index)}
+                                                key={index}
+                                            >
+                                                {tache.name}
+                                            </li>
+                                        ))}
+                                </ul>
+                                <ul className="ul-tache">
+                                    <h3>Terminées</h3>
+                                    {this.props.taches &&
+                                        this.props.taches.filter(tache => tache.statut===true).map((tache, index) => (
+                                            <li
+                                                className={
+                                                    "box-taches-item " +
+                                                    (tache === currentTache ? "active" : "")
+                                                }
+                                                onClick={() => this.setActiveTache(tache, index)}
+                                                key={index}
+                                            >
+                                                {tache.name}
+                                            </li>
+                                        ))}
+                                </ul>
+                            </div>
+                        )}
                         <button
-                            className="btn-search"
-                            type="button"
-                            onClick={this.searchName}
+                            className="btn-remove-all"
+                            onClick={(e)=>this.removeAllTaches(e)}
                         >
-                            Search
+                            Remove All
                         </button>
                     </div>
                 </div>
-                <div className="box-taches">
-                    <h2>liste des taches</h2>
-                    <ul className="ul-tache">
-                        {this.props.taches &&
-                            this.props.taches.map((tache, index) => (
-                                <li
-                                    className={
-                                        "box-taches-item " +
-                                        (index === currentIndex ? "active" : "")
-                                    }
-                                    onClick={() => this.setActiveTache(tache, index)}
-                                    key={index}
-                                >
-                                        {tache.name}
-                                </li>
-                            ))}
-                    </ul>
-                    <button
-                        className="btn-remove-all"
-                        onClick={this.removeAllTaches}
-                    >
-                        Remove All
-                    </button>
-                </div>
-                <div className="box-current-tache">
+                <div className="container-current-tache">
                     {currentTache ? (
-                        <div>
+                        <div className="box-current-tache">
                             <h4>Tache {currentIndex+1}</h4>
-                            <div>
+                            <div className="label-current-tache">
                                 <label>
                                     <strong>Nom:</strong>
                                 </label>{" "}
                                 {currentTache.name}
                             </div>
-                            <div>
+                            <div className="label-current-tache">
                                 <label>
                                     <strong>Description:</strong>
                                 </label>{" "}
                                 {currentTache.description}
                             </div>
-                            <div>
+                            <div className="label-current-tache">
                                 <label>
                                     <strong>Statut:</strong>
                                 </label>{" "}
                                 {currentTache.statut ? "Terminé" : "Non terminé"}
                             </div>
-                            <div>
+                            <div className="label-current-tache">
                                 <label>
                                     <strong>Date d'ajout:</strong>
                                 </label>{" "}
                                 {this.formatDate(currentTache.createdAt)}
                             </div>
-                            <Link
-                                to={"/taches/" + currentTache.id}
-                                className="current-tache-edit"
-                            >
-                                <strong>Modifier</strong>
-                            </Link>
-                            <a
-                                href = "#"
-                                onClick={(e) => this.removeTache(currentTache.id, e)}
-                                className="current-tache-edit"
-                            >
-                                <strong>Remove</strong>
-                            </a>
-                            <a
-                                href = "#"
-                                onClick={(e) => this.changeStatut(currentTache, e)}
-                                className="current-tache-edit"
-                            >
-                                <strong>{currentTache.statut ? "Reprendre" : "Terminer"}</strong>
-                            </a>
+                            <div className="label-current-tache">
+                                <Link
+                                    to={"/taches/" + currentTache.id}
+                                    className="current-tache-edit"
+                                >
+                                    <strong>Modifier</strong>
+                                </Link>
+                                <a
+                                    href = "#"
+                                    onClick={(e) => this.removeTache(currentTache.id, e)}
+                                    className="current-tache-edit"
+                                >
+                                    <strong>Remove</strong>
+                                </a>
+                                <a
+                                    href = "#"
+                                    onClick={(e) => this.changeStatut(currentTache, e)}
+                                    className="current-tache-edit"
+                                >
+                                    <strong>{currentTache.statut ? "Reprendre" : "Terminer"}</strong>
+                                </a>
+                            </div>
                         </div>
                     ) : (
-                        <div>
-                            <p>Je vous prie de sélectionner une tâche...</p>
+                        <div className="current-vide">
+                            <h3>Je vous prie de sélectionner une tâche...</h3>
                         </div>
                     )}
                 </div>
