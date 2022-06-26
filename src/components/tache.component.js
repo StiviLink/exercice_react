@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 import TacheDataService from "../services/tache.service";
+import { connect } from "react-redux";
+import { addTache } from "../actions";
 // eslint-disable-next-line no-unused-vars
 let deleted = false;
-let del = false;
-export default class Tache extends Component {
+class Tache extends Component {
     constructor(props) {
         super(props);
         this.onChangeName = this.onChangeName.bind(this);
@@ -22,21 +23,40 @@ export default class Tache extends Component {
             message: ""
         };
     }
+    getAllTaches(){
+        TacheDataService.getAll()
+            .then(response => {
+                this.props.taches.forEach(tache=>{
+                    this.props.onDelete(tache.id);
+                })
+                response.data.forEach(tache =>{
+                    let result = !!this.props.taches.filter(taches => taches.id === tache.id);
+                    if(result){
+                        console.log(tache.id);
+                        this.props.onAddTache({
+                            id : tache.id,
+                            name : tache.name,
+                            description : tache.description,
+                            statut : tache.statut,
+                            createdAt : tache.createdAt
+                        });
+                    }
+                });
+                console.log(response.data);
+            })
+            .catch(e => {
+                console.log(e);
+            });
+    }
     componentDidMount() {
         const url = window.location.href;
-        const idDelete = url.split('http://localhost:4001/delete/')[1];
-        const id = idDelete ? idDelete : url.split('http://localhost:4001/taches/')[1];
-        this.getTache(id);
-        if(idDelete===id)
-            // eslint-disable-next-line react/no-direct-mutation-state
-            del = true;
-        /*if(idDelete){
-            deleted=true;
-            this.getTache(idDelete);
-            this.deleteTache();
-        }else {
-            const id = url.split('http://localhost:4001/taches/');
-        }*/
+        const id = url.split('http://localhost:4001/taches/')[1];
+        this.getAllTaches();
+        if(this.props.taches.filter(taches => taches.id === id).length===1){
+            this.getTache(id);
+        }else{
+            window.location.assign('../');
+        }
     }
     onChangeName(e) {
         const name = e.target.value;
@@ -129,22 +149,14 @@ export default class Tache extends Component {
         const { currentTache } = this.state;
         return (
             <div>
-                {del ? (
+                {deleted ? (
                     <div className="submit-form">
-                        {this.deleteTache}
-                        <h4>Vous êtes sûre de vouloir supprimer cette tâche??!</h4>
-                        <button className="btn-add" onClick={this.deleteTache}>
-                            Remove
-                        </button>
-                    </div>
-                ) :deleted ? (
-                    <div className="submit-form">
-                        <h4>You delete successfully!</h4>
-                        <button className="btn-add" onClick={window.location.assign("../")}>
+                        <h4>Tache deleted successfully!</h4>
+                        <button className="btn-add" onClick={()=>window.location.assign("../")}>
                             Back
                         </button>
                     </div>
-                ) : currentTache && !del ? (
+                ) : currentTache ? (
                     <div className="submit-form">
                         <form>
                             <div className="form-group">
@@ -207,3 +219,20 @@ export default class Tache extends Component {
         );
     }
 }
+
+const mapStateToProps = state => {
+    return {
+        taches: state
+    };
+};
+const mapDispatchToProps = dispatch => {
+    return {
+        onAddTache: tache => {
+            dispatch(addTache(tache));
+        }
+    };
+};
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(Tache);

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {Routes, Route, Link} from "react-router-dom";
+import {Routes, Route, Link, Navigate} from "react-router-dom";
 import "./App.css";
 import "font-awesome/css/font-awesome.min.css";
 import AddTache from "./components/add-tache.component";
@@ -27,10 +27,10 @@ class App extends Component {
                 </div>
             </nav>
             <Routes>
-                <Route exact path="/" element={<TachesList/>} />
-                <Route exact path="/taches" element={<TachesList/>} />
+                <Route path="*" element={<Navigate to="/taches" />} />
+                <Route exact path= "/taches" element={<TachesList/>} />
                 <Route exact path="/add" element={<AddTache/>} />
-                <Route path="/taches/:id" element={<Tache/>} />
+                <Route exact path="/taches/:id" element={<Tache/>} />
             </Routes>
         </div>
     );

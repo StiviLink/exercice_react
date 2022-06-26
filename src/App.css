@@ -30,6 +30,7 @@
   margin-top: 2vh;
   width: 20%;
   height: 2.3em;
+  cursor: pointer;
   border-radius: 3px;
   color: #efefef;
   background-color: #d93232;
@@ -123,6 +124,7 @@
   border: 1px solid rgba(0,0,0,.125);
   border-radius: .25rem;
   font-size: 1.2em;
+  cursor: default;
 }
 .box-taches-item.active{
   z-index: 2;
@@ -190,5 +192,5 @@
 .current-vide{
   text-align: center;
   margin-top: 20vh;
-  color : #38404b;
+  color : #af4e4e;
 }
