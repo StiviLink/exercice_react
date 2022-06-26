@@ -29,7 +29,6 @@ class App extends Component {
             <Routes>
                 <Route exact path="/" element={<TachesList/>} />
                 <Route exact path="/taches" element={<TachesList/>} />
-                <Route exact path="/delete/:id" element={<Tache/>} />
                 <Route exact path="/add" element={<AddTache/>} />
                 <Route path="/taches/:id" element={<Tache/>} />
             </Routes>
