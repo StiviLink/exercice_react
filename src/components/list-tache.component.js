@@ -79,10 +79,17 @@ class TachesList extends Component {
         });
     }
     setActiveTache(tache, index) {
-        this.setState({
-            currentTache: tache,
-            currentIndex: index
-        });
+        if(this.state.currentIndex !== index){
+            this.setState({
+                currentTache: tache,
+                currentIndex: index
+            });
+        }else {
+            this.setState({
+                currentTache: null,
+                currentIndex: -1
+            });
+        }
     }
     removeAllTaches() {
         TacheDataService.deleteAll()
@@ -120,6 +127,11 @@ class TachesList extends Component {
             .catch(e => {
                 console.log(e);
             });
+    }
+    formatDate(date){
+        const jour = date.split('T')[0].split('-').reverse().join(' ');
+        const heure = date.split('T')[1].split('', 8).join('');
+        return jour + " à " + heure;
     }
     render() {
         const { searchName, currentTache, currentIndex } = this.state;
@@ -193,7 +205,7 @@ class TachesList extends Component {
                                 <label>
                                     <strong>Date d'ajout:</strong>
                                 </label>{" "}
-                                {currentTache.createdAt}
+                                {this.formatDate(currentTache.createdAt)}
                             </div>
                             <Link
                                 to={"/taches/" + currentTache.id}

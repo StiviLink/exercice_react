@@ -1,13 +1,13 @@
 import { ADD_TACHE, DELETE_TACHE, MODIFY_TACHE } from "./types";
 
-export const addTache = ({id, name, description, statut, createdDate})=>({
+export const addTache = ({id, name, description, statut, createdAt})=>({
     type : ADD_TACHE,
     tacheLoad : {
         id,
         name,
         description,
         statut,
-        createdDate
+        createdAt
     }
 });
 
