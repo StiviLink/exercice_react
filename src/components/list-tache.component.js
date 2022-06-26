@@ -1,210 +1,251 @@
 import React, { Component } from "react";
 import TacheDataService from "../services/tache.service";
-// eslint-disable-next-line no-unused-vars
-let deleted = false;
-let del = false;
-export default class Tache extends Component {
+import { Link } from "react-router-dom";
+import { connect } from "react-redux";
+import { deleteTache, addTache, modifyTache } from "../actions";
+
+class TachesList extends Component {
     constructor(props) {
         super(props);
-        this.onChangeName = this.onChangeName.bind(this);
-        this.onChangeDescription = this.onChangeDescription.bind(this);
-        this.getTache = this.getTache.bind(this);
-        this.updateStatut = this.updateStatut.bind(this);
-        this.updateTache = this.updateTache.bind(this);
-        this.deleteTache = this.deleteTache.bind(this);
+        this.onChangeSearchName = this.onChangeSearchName.bind(this);
+        this.retrieveTaches = this.retrieveTaches.bind(this);
+        this.refreshList = this.refreshList.bind(this);
+        this.setActiveTache = this.setActiveTache.bind(this);
+        this.removeAllTaches = this.removeAllTaches.bind(this);
+        this.removeTache = this.removeTache.bind(this);
+        this.searchName = this.searchName.bind(this);
         this.state = {
-            currentTache: {
-                id: null,
-                name: "",
-                description: "",
-                statut: false
-            },
-            message: ""
+            currentTache: null,
+            currentIndex: -1,
+            searchName: ""
         };
     }
     componentDidMount() {
-        const url = window.location.href;
-        const idDelete = url.split('http://localhost:4001/delete/')[1];
-        const id = idDelete ? idDelete : url.split('http://localhost:4001/taches/')[1];
-        this.getTache(id);
-        if(idDelete===id)
-            // eslint-disable-next-line react/no-direct-mutation-state
-            del = true;
-        /*if(idDelete){
-            deleted=true;
-            this.getTache(idDelete);
-            this.deleteTache();
-        }else {
-            const id = url.split('http://localhost:4001/taches/');
-        }*/
+        this.retrieveTaches();
     }
-    onChangeName(e) {
-        const name = e.target.value;
-        this.setState(function(prevState) {
-            return {
-                currentTache: {
-                    ...prevState.currentTache,
-                    name: name
-                }
-            };
+    onChangeSearchName(e) {
+        const searchName = e.target.value;
+        this.setState({
+            searchName: searchName
         });
     }
-    onChangeDescription(e) {
-        const description = e.target.value;
-
-        this.setState(prevState => ({
-            currentTache: {
-                ...prevState.currentTache,
-                description: description
-            }
-        }));
-    }
-    getTache(id) {
-        TacheDataService.get(id)
-            .then(response => {
-                this.setState({
-                    currentTache: response.data
-                });
-                console.log(response.data);
-            })
-            .catch(e => {
-                console.log(e);
-            });
-    }
-    updateStatut(status) {
+    changeStatut(tache, e){
+        e.preventDefault();
+        this.props.onModifyStatut(tache.id);
+        this.setState({
+            currentTache : tache
+        })
         const data = {
-            statut: status
+            statut: !tache.statut
         };
-        TacheDataService.update(this.state.currentTache.id, data)
+        TacheDataService.update(tache.id, data)
             .then(response => {
-                this.setState(prevState => ({
-                    currentTache: {
-                        ...prevState.currentTache,
-                        statut: status
+                console.log(response.data);
+            })
+            .catch(e => {
+                console.log(e);
+            });
+    }
+    retrieveTaches() {
+        TacheDataService.getAll()
+            .then(response => {
+                this.props.taches.forEach(tache=>{
+                    this.props.taches.onDelete(tache.id);
+                })
+                response.data.forEach(tache =>{
+                    let result = !!this.props.taches.filter(taches => taches.id === tache.id);
+                    if(result){
+                        console.log(tache.id);
+                        this.props.onAddTache({
+                            id : tache.id,
+                            name : tache.name,
+                            description : tache.description,
+                            statut : tache.statut,
+                            createdAt : tache.createdAt
+                        });
                     }
-                }));
-                console.log(response.data);
-            })
-            .catch(e => {
-                console.log(e);
-            });
-    }
-    updateTache() {
-        TacheDataService.update(
-            this.state.currentTache.id,
-            this.state.currentTache
-        )
-            .then(response => {
-                console.log(response.data);
-                this.setState({
-                    message: "The tache was updated successfully!"
                 });
+                console.log(response.data);
             })
             .catch(e => {
                 console.log(e);
             });
     }
-    deleteTache() {
-        deleted = true;
-        TacheDataService.delete(this.state.currentTache.id)
+    refreshList() {
+        this.retrieveTaches();
+        this.setState({
+            currentTache: null,
+            currentIndex: -1
+        });
+    }
+    setActiveTache(tache, index) {
+        this.setState({
+            currentTache: tache,
+            currentIndex: index
+        });
+    }
+    removeAllTaches() {
+        TacheDataService.deleteAll()
             .then(response => {
                 console.log(response.data);
-                this.setState(prevState => ({
-                    currentTache: {
-                        ...prevState.currentTache,
-                        id: null,
-                        name: "",
-                        description: "",
-                        statut: false
-                    },
-                    message: "Tache supprimée"
-                }));
-                this.props.history.push('/taches');
+                this.refreshList();
+            })
+            .catch(e => {
+                console.log(e);
+            });
+    }
+    removeTache(id, e) {
+        e.preventDefault();
+        this.props.onDelete(id);
+        this.setState({
+            currentTache: null,
+            currentIndex: -1
+        });
+        TacheDataService.delete(id)
+            .then(response => {
+                console.log(response.data);
+            })
+            .catch(e => {
+                console.log(e);
+            });
+    }
+    searchName() {
+        TacheDataService.findByName(this.state.searchName)
+            .then(response => {
+                this.setState({
+                    taches: response.data
+                });
+                console.log(response.data);
             })
             .catch(e => {
                 console.log(e);
             });
     }
     render() {
-        const { currentTache } = this.state;
+        const { searchName, currentTache, currentIndex } = this.state;
         return (
-            <div>
-                {del ? (
-                    <div className="submit-form">
-                        {this.deleteTache}
-                        <h4>Vous êtes sûre de vouloir supprimer cette tâche??!</h4>
-                        <button className="btn-add" onClick={this.deleteTache}>
-                            Remove
-                        </button>
-                    </div>
-                ) :deleted ? (
-                    <div className="submit-form">
-                        <h4>You delete successfully!</h4>
-                        <button className="btn-add" onClick={window.location.assign("../")}>
-                            Back
-                        </button>
-                    </div>
-                ) : currentTache && !del ? (
-                    <div className="submit-form">
-                        <form>
-                            <div className="form-group">
-                                <label htmlFor="name">Nom</label>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    id="name"
-                                    value={currentTache.name}
-                                    onChange={this.onChangeName}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label htmlFor="description">Description</label>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    id="description"
-                                    value={currentTache.description}
-                                    onChange={this.onChangeDescription}
-                                />
-                            </div>
-                        </form>
-                        {currentTache.statut ? (
-                            <button
-                                className="btn-modify"
-                                onClick={() => this.updateStatut(false)}
-                            >
-                                Reprendre
-                            </button>
-                        ) : (
-                            <button
-                                className="btn-modify"
-                                onClick={() => this.updateStatut(true)}
-                            >
-                                Terminer
-                            </button>
-                        )}
+            <div className="container">
+                <div className="box-search">
+                        <input
+                            type="text"
+                            className="barre-search"
+                            placeholder="Search by name"
+                            value={searchName}
+                            onChange={this.onChangeSearchName}
+                        />
+                    <div className="input-group-append">
                         <button
-                            className="btn-modify"
-                            onClick={this.deleteTache}
+                            className="btn-search"
+                            type="button"
+                            onClick={this.searchName}
                         >
-                            Supprimer
+                            Search
                         </button>
-                        <button
-                            type="submit"
-                            className="btn-modify"
-                            onClick={this.updateTache}
-                        >
-                            Update
-                        </button>
-                        <p>{this.state.message}</p>
                     </div>
-                ) : (
-                    <div>
-                        <br />
-                        <p>Je vous prie de sélectionner une tâche...</p>
-                    </div>
-                )}
+                </div>
+                <div className="box-taches">
+                    <h2>liste des taches</h2>
+                    <ul className="ul-tache">
+                        {this.props.taches &&
+                            this.props.taches.map((tache, index) => (
+                                <li
+                                    className={
+                                        "box-taches-item " +
+                                        (index === currentIndex ? "active" : "")
+                                    }
+                                    onClick={() => this.setActiveTache(tache, index)}
+                                    key={index}
+                                >
+                                        {tache.name}
+                                </li>
+                            ))}
+                    </ul>
+                    <button
+                        className="btn-remove-all"
+                        onClick={this.removeAllTaches}
+                    >
+                        Remove All
+                    </button>
+                </div>
+                <div className="box-current-tache">
+                    {currentTache ? (
+                        <div>
+                            <h4>Tache {currentIndex+1}</h4>
+                            <div>
+                                <label>
+                                    <strong>Nom:</strong>
+                                </label>{" "}
+                                {currentTache.name}
+                            </div>
+                            <div>
+                                <label>
+                                    <strong>Description:</strong>
+                                </label>{" "}
+                                {currentTache.description}
+                            </div>
+                            <div>
+                                <label>
+                                    <strong>Statut:</strong>
+                                </label>{" "}
+                                {currentTache.statut ? "Terminé" : "Non terminé"}
+                            </div>
+                            <div>
+                                <label>
+                                    <strong>Date d'ajout:</strong>
+                                </label>{" "}
+                                {currentTache.createdAt}
+                            </div>
+                            <Link
+                                to={"/taches/" + currentTache.id}
+                                className="current-tache-edit"
+                            >
+                                <strong>Modifier</strong>
+                            </Link>
+                            <a
+                                href = "#"
+                                onClick={(e) => this.removeTache(currentTache.id, e)}
+                                className="current-tache-edit"
+                            >
+                                <strong>Remove</strong>
+                            </a>
+                            <a
+                                href = "#"
+                                onClick={(e) => this.changeStatut(currentTache, e)}
+                                className="current-tache-edit"
+                            >
+                                <strong>{currentTache.statut ? "Reprendre" : "Terminer"}</strong>
+                            </a>
+                        </div>
+                    ) : (
+                        <div>
+                            <p>Je vous prie de sélectionner une tâche...</p>
+                        </div>
+                    )}
+                </div>
             </div>
         );
     }
 }
+
+const mapStateToProps = state => {
+    return {
+        taches: state
+    };
+};
+const mapDispatchToProps = dispatch => {
+    return {
+        onAddTache: tache => {
+            dispatch(addTache(tache));
+        },
+        onDelete: id => {
+            dispatch(deleteTache(id));
+        },
+        onModifyStatut: id => {
+            dispatch(modifyTache(id))
+        }
+    };
+};
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(TachesList);
