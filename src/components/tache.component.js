@@ -73,9 +73,6 @@ export default class Tache extends Component {
     }
     updateStatut(status) {
         const data = {
-            id: this.state.currentTache.id,
-            name: this.state.currentTache.name,
-            description: this.state.currentTache.description,
             statut: status
         };
         TacheDataService.update(this.state.currentTache.id, data)

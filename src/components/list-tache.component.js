@@ -1,7 +1,10 @@
 import React, { Component } from "react";
 import TacheDataService from "../services/tache.service";
 import { Link } from "react-router-dom";
-export default class TachesList extends Component {
+import { connect } from "react-redux";
+import { deleteTache, addTache, modifyTache } from "../actions";
+
+class TachesList extends Component {
     constructor(props) {
         super(props);
         this.onChangeSearchName = this.onChangeSearchName.bind(this);
@@ -12,7 +15,6 @@ export default class TachesList extends Component {
         this.removeTache = this.removeTache.bind(this);
         this.searchName = this.searchName.bind(this);
         this.state = {
-            taches: [],
             currentTache: null,
             currentIndex: -1,
             searchName: ""
@@ -27,11 +29,41 @@ export default class TachesList extends Component {
             searchName: searchName
         });
     }
+    changeStatut(tache, e){
+        e.preventDefault();
+        this.props.onModifyStatut(tache.id);
+        this.setState({
+            currentTache : tache
+        })
+        const data = {
+            statut: !tache.statut
+        };
+        TacheDataService.update(tache.id, data)
+            .then(response => {
+                console.log(response.data);
+            })
+            .catch(e => {
+                console.log(e);
+            });
+    }
     retrieveTaches() {
         TacheDataService.getAll()
             .then(response => {
-                this.setState({
-                    taches: response.data
+                this.props.taches.forEach(tache=>{
+                    this.props.taches.onDelete(tache.id);
+                })
+                response.data.forEach(tache =>{
+                    let result = !!this.props.taches.filter(taches => taches.id === tache.id);
+                    if(result){
+                        console.log(tache.id);
+                        this.props.onAddTache({
+                            id : tache.id,
+                            name : tache.name,
+                            description : tache.description,
+                            statut : tache.statut,
+                            createdAt : tache.createdAt
+                        });
+                    }
                 });
                 console.log(response.data);
             })
@@ -62,11 +94,16 @@ export default class TachesList extends Component {
                 console.log(e);
             });
     }
-    removeTache(id) {
+    removeTache(id, e) {
+        e.preventDefault();
+        this.props.onDelete(id);
+        this.setState({
+            currentTache: null,
+            currentIndex: -1
+        });
         TacheDataService.delete(id)
             .then(response => {
                 console.log(response.data);
-                this.refreshList();
             })
             .catch(e => {
                 console.log(e);
@@ -85,7 +122,7 @@ export default class TachesList extends Component {
             });
     }
     render() {
-        const { searchName, taches, currentTache, currentIndex } = this.state;
+        const { searchName, currentTache, currentIndex } = this.state;
         return (
             <div className="container">
                 <div className="box-search">
@@ -109,8 +146,8 @@ export default class TachesList extends Component {
                 <div className="box-taches">
                     <h2>liste des taches</h2>
                     <ul className="ul-tache">
-                        {taches &&
-                            taches.map((tache, index) => (
+                        {this.props.taches &&
+                            this.props.taches.map((tache, index) => (
                                 <li
                                     className={
                                         "box-taches-item " +
@@ -164,18 +201,20 @@ export default class TachesList extends Component {
                             >
                                 <strong>Modifier</strong>
                             </Link>
-                            <Link
-                                to={"/delete/" + currentTache.id}
+                            <a
+                                href = "#"
+                                onClick={(e) => this.removeTache(currentTache.id, e)}
                                 className="current-tache-edit"
                             >
                                 <strong>Remove</strong>
-                            </Link>
-                            <Link
-                                to={"/taches/" + currentTache.id}
+                            </a>
+                            <a
+                                href = "#"
+                                onClick={(e) => this.changeStatut(currentTache, e)}
                                 className="current-tache-edit"
                             >
                                 <strong>{currentTache.statut ? "Reprendre" : "Terminer"}</strong>
-                            </Link>
+                            </a>
                         </div>
                     ) : (
                         <div>
@@ -187,3 +226,26 @@ export default class TachesList extends Component {
         );
     }
 }
+
+const mapStateToProps = state => {
+    return {
+        taches: state
+    };
+};
+const mapDispatchToProps = dispatch => {
+    return {
+        onAddTache: tache => {
+            dispatch(addTache(tache));
+        },
+        onDelete: id => {
+            dispatch(deleteTache(id));
+        },
+        onModifyStatut: id => {
+            dispatch(modifyTache(id))
+        }
+    };
+};
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(TachesList);
